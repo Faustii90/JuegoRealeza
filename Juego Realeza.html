@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ascenso Real</title>
+  <style>
+    body {
+  font-family: 'Georgia', serif;
+  background: linear-gradient(to top, #e5d8c6, #fffbe6);
+  color: #4b3621;
+  text-align: center;
+  padding: 30px;
+  margin: 0;
+}
+
+.pantalla {
+  display: none;
+}
+
+.visible {
+  display: block;
+}
+
+button {
+  background-color: #7a5230;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  margin: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #5a3a1e;
+}
+
+#status {
+  margin-top: 20px;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+#requisitos {
+  margin-top: 15px;
+  font-weight: bold;
+  color: #825a2c;
+}
+
+#opcionesNivel {
+  margin: 20px 0;
+}
+
+#ayudaTexto {
+  max-width: 600px;
+  margin: 20px auto;
+  background-color: #f8f4e3;
+  border-radius: 10px;
+  padding: 15px;
+  color: #4b3621;
+  text-align: left;
+  box-shadow: 0 0 10px rgba(122, 82, 48, 0.3);
+}
+
+#btnRendirse {
+  background-color: #a12828;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  margin: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#btnRendirse:hover {
+  background-color: #731c1c;
+}
+  </style>
+</head>
+<body>
+  <div id="inicio" class="pantalla visible">
+    <h1>Ascenso Real</h1>
+    <h2>¿Podrás llegar al trono?</h2>
+    <button onclick="mostrarPantalla('genero')">Iniciar Juego</button>
+    <button onclick="toggleAyuda()">Ayuda</button>
+  </div>
+
+  <div id="genero" class="pantalla">
+    <h2>¿Quién eres?</h2>
+    <button onclick="elegirGenero('hombre')">👑 Hombre</button>
+    <button onclick="elegirGenero('mujer')">👑 Mujer</button>
+  </div>
+
+  <div id="origen" class="pantalla">
+    <h2>Elige tu origen</h2>
+    <button onclick="elegirOrigen('campesino')">⚒️ Campesino</button>
+    <button onclick="elegirOrigen('escriba')">📜 Escriba</button>
+    <button onclick="elegirOrigen('mensajero')">🐎 Mensajero</button>
+    <button onclick="elegirOrigen('recluta')">⚔️ Recluta</button>
+  </div>
+
+  <div id="juego" class="pantalla">
+    <h2 id="tituloNivel">-</h2>
+    <p id="descripcionNivel">-</p>
+    <div id="opcionesNivel"></div>
+    <div id="requisitos"></div>
+    <button onclick="mostrarOpciones()">🧭 Tomar Decisión</button>
+    <button onclick="trabajar()">💼 Trabajar Duro</button>
+    <button onclick="intentarAscenso()">🏆 Comprar Ascenso</button>
+    <div id="status">
+      Título: <span id="tituloActual">-</span><br />
+      Dinero: $<span id="dinero">0</span><br />
+      Reputación: <span id="reputacion">0</span><br />
+      Sueldo automático: $<span id="sueldo">0</span> cada 10s
+    </div>
+  </div>
+
+  <div id="ayudaTexto" style="display:none;">
+    <h3>Ayuda</h3>
+    <p>Bienvenido al mundo de la realeza.
+    En este juego tendrás que avanzar en el mundo de la realeza, desde un criado hasta el temido rey. 
+    Para eso, necesitas ganar dinero trabajando y reputación tomando decisiones.<br> 
+    <strong>Instrucciones:</strong><br>
+    Se te presentará un menú, donde tendrás que elegir tu género y tu origen, si tienes suerte lograrás entrar a un palacio como criado, tendrás una lista de botones con opciones para trabajar y tomar decisiones que afectan tu reputación y dinero, para poder comprar ascensos a títulos nobiliarios. Cada ascenso tendrá requisitos de reputación y dinero, y algunos serán más difíciles que otros, además recibirás un sueldo automático que aumentará a medida que avances. ¡Buena Suerte! 
+    </p>
+  </div>
+
+<button id="btnRendirse" onclick="rendirse()" style="display: none;">😩 Me Rindo</button>
+  <script>
+let genero = '';
+let origen = '';
+let reputacion = 0;
+let dinero = 0;
+let nivel = 0;
+let sueldoAutomatico = 0;
+let intervaloSueldo;
+let decisionTomada = false;
+
+const titulos = {
+  hombre: ["Criado", "Lacayo", "Mayordomo", "Mayordomo Jefe", "Barón", "Vizconde", "Conde", "Marqués", "Duque", "Príncipe", "Rey"],
+  mujer: ["Criada", "Doncella", "Ama de Llaves", "Baronesa", "Vizcondesa", "Condesa", "Marquesa", "Duquesa", "Princesa", "Reina"]
+};
+
+const niveles = [
+  { descripcion: "Comienzas desde abajo en el castillo.", reputacion: 0.7, sueldo: 2 },
+  { descripcion: "Asistes a nobles y figuras importantes.", reputacion: 2.9, sueldo: 10 },
+  { descripcion: "Gestionas tareas y sirvientes.", reputacion: 3.8, sueldo: 20 },
+  { descripcion: "Has alcanzado la cima del servicio o ingresado a la nobleza.", reputacion: 1.0, sueldo: 40 },
+  { descripcion: "Tu influencia en la nobleza aumenta.", reputacion: 1.5, sueldo: 80 },
+  { descripcion: "Tu nombre es respetado en toda la región.", reputacion: 2.0, sueldo: 160 },
+  { descripcion: "Controlas tierras y ejércitos.", reputacion: 2.5, sueldo: 320 },
+  { descripcion: "Uno de los más poderosos bajo el trono.", reputacion: 3.0, sueldo: 640 },
+  { descripcion: "Estás a un paso del poder absoluto.", reputacion: 4.0, sueldo: 1280 },
+  { descripcion: "Has alcanzado la cima del poder.", reputacion: 5.0, sueldo: 2560 }
+];
+
+// Decisiones para cada nivel (puedes agregar más o personalizar)
+const decisionesPorNivel = [
+  ["Ayudar al cocinero", "Limpiar armas"],
+  ["Ser educado y útil", "Espiar conversaciones"],
+  ["Organizar banquete", "Estudiar estrategia"],
+  ["Entrenar soldados", "Recaudar impuestos"],
+  ["Forjar alianzas", "Visitar al rey"],
+  ["Atender consejo", "Ordenar construcción"],
+  ["Reformar leyes", "Reforzar ejército"],
+  ["Expandir comercio", "Aumentar impuestos"],
+  ["Gobernar con sabiduría", "Tomar poder por la fuerza"],
+  ["Conceder perdón", "Buscar venganza"]
+];
+
+function mostrarPantalla(id) {
+  document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('visible'));
+  document.getElementById(id).classList.add('visible');
+  if (id !== 'ayudaTexto') document.getElementById('ayudaTexto').style.display = 'none';
+}
+
+function toggleAyuda() {
+  const ayuda = document.getElementById('ayudaTexto');
+  ayuda.style.display = ayuda.style.display === 'block' ? 'none' : 'block';
+}
+
+function elegirGenero(gen) {
+  genero = gen;
+  mostrarPantalla('origen');
+}
+
+function elegirOrigen(org) {
+  origen = org;
+  reputacion = org === 'campesino' ? 1 : org === 'escriba' ? 2 : org === 'mensajero' ? 1.5 : 2.5;
+  dinero = 0;
+  nivel = 0;
+  mostrarNivel();
+  iniciarSueldo();
+}
+
+function mostrarNivel() {
+  mostrarPantalla('juego');
+  document.getElementById('btnRendirse').style.display = 'inline-block';
+  const n = niveles[nivel];
+  const titulo = titulos[genero][nivel] || "-";
+  document.getElementById('tituloNivel').innerText = titulo;
+  document.getElementById('descripcionNivel').innerText = n.descripcion;
+  document.getElementById('requisitos').innerText = `Para ascender necesitas reputación: ${n.reputacion} y dinero: $${calcularDineroRequerido()}`;
+  document.getElementById('tituloActual').innerText = titulo;
+  document.getElementById('dinero').innerText = dinero;
+  document.getElementById('reputacion').innerText = reputacion.toFixed(2);
+  document.getElementById('sueldo').innerText = n.sueldo;
+  decisionTomada = false;
+  mostrarOpciones(false);
+}
+
+function mostrarOpciones(mostrar = true) {
+  const opcionesDiv = document.getElementById('opcionesNivel');
+  if (!mostrar) {
+    opcionesDiv.innerHTML = '';
+    return;
+  }
+  const opciones = decisionesPorNivel[nivel] || [];
+  let html = '';
+  opciones.forEach((opcion, idx) => {
+    html += `<button onclick="tomarDecision(${idx})">${opcion}</button>`;
+  });
+  opcionesDiv.innerHTML = html;
+}
+
+function trabajar() {
+  dinero += 5;
+  document.getElementById('dinero').innerText = dinero;
+}
+
+function tomarDecision(indice) {
+  if (decisionTomada) return alert("Ya tomaste una decisión para este nivel. Ahora intenta ascender.");
+  const opciones = decisionesPorNivel[nivel];
+  if (!opciones || !opciones[indice]) return alert("Opción inválida.");
+  // Aquí puedes personalizar efectos de las decisiones, por ahora sube reputación variable
+  const gananciaRep = Math.random() * 0.5 + 0.2;
+  reputacion += gananciaRep;
+  decisionTomada = true;
+  alert(`Decisión tomada: ${opciones[indice]}. Reputación aumentada en ${gananciaRep.toFixed(2)}.`);
+  document.getElementById('reputacion').innerText = reputacion.toFixed(2);
+  mostrarOpciones(false);
+}
+
+function calcularDineroRequerido() {
+  // Dificultad especial para ascenso Mayordomo Jefe (hombres, nivel 3) y Ama de Llaves (mujeres, nivel 2)
+  if (genero === 'hombre' && nivel === 3) return 15000; // Mayordomo Jefe a Barón
+  if (genero === 'mujer' && nivel === 2) return 15000; // Ama de Llaves a Baronesa
+  return 50 + Math.pow(nivel, 2) * 200;
+}
+
+function intentarAscenso() {
+  const requerido = niveles[nivel];
+  const dineroReq = calcularDineroRequerido();
+  if (reputacion >= requerido.reputacion && dinero >= dineroReq && decisionTomada) {
+    reputacion += 0.5;
+    dinero -= dineroReq;
+    nivel++;
+    if (nivel >= niveles.length) {
+      alert("¡Ya eres el máximo gobernante!");
+      nivel = niveles.length - 1;
+    }
+    mostrarNivel();
+  } else {
+    alert(`Necesitas reputación ${requerido.reputacion.toFixed(1)}, $${dineroReq} y haber tomado una decisión.`);
+  }
+}
+
+function iniciarSueldo() {
+  if (intervaloSueldo) clearInterval(intervaloSueldo);
+  intervaloSueldo = setInterval(() => {
+    dinero += niveles[nivel].sueldo;
+    document.getElementById('dinero').innerText = dinero;
+  }, 10000);
+}
+
+function rendirse() {
+  const confirmar = confirm("¿Estás seguro de que quieres rendirte y cerrar el juego?");
+  if (confirmar) {
+    window.open('', '_self'); // Necesario en algunos navegadores
+    window.close();
+  }
+}  </script>
+</body>
+</html>
