@@ -298,9 +298,41 @@ function rendirse() {
     window.close();
   }
 } 
-  function verificarCodigo() {
+function verificarCodigo() {
   const input = document.getElementById("codigoInput").value.trim().toLowerCase();
+  console.log("Código ingresado:", input); // Esto muestra en consola lo que escribiste
   const mensaje = document.getElementById("mensajeCodigo");
+
+  if (input === "dinemax") {
+    mensaje.textContent = "¡Comenzarás con $900.000!";
+    mensaje.style.color = "green";
+
+    localStorage.setItem("activarDinemax", "true");
+
+  } else if (input === "reyya") {
+    mensaje.textContent = "¡Has ascendido directamente a Rey!";
+    mensaje.style.color = "green";
+    nivel = titulos[genero].length - 1;
+    reputacion = 999;
+    dinero = 999999;
+    mostrarNivel();
+
+  } else if (input === "duqueplus") {
+    mensaje.textContent = "¡Ahora eres un Duque!";
+    mensaje.style.color = "green";
+    nivel = titulos[genero].indexOf(genero === "hombre" ? "Duque" : "Duquesa");
+    reputacion = 50;
+    dinero = 10000;
+    mostrarNivel();
+
+  } else {
+    mensaje.textContent = "Código inválido.";
+    mensaje.style.color = "red";
+  }
+
+  document.getElementById("codigoInput").value = "";
+}
+
 
   if (input === "dinemax") {
     mensaje.textContent = "¡Comenzarás con $900.000!";
