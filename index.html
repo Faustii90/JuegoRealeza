@@ -211,6 +211,11 @@ function elegirOrigen(org) {
   iniciarSueldo();
 }
 
+    if (localStorage.getItem("activarSuperRep") === "true") {
+  reputacion += 50;
+  localStorage.removeItem("activarSuperRep");
+}
+
 function mostrarNivel() {
   mostrarPantalla('juego');
   document.getElementById('btnRendirse').style.display = 'inline-block';
@@ -331,6 +336,15 @@ function verificarCodigo() {
   }
 
   document.getElementById("codigoInput").value = "";
+
+  else if (input === "superrep") {
+  mensaje.textContent = "¡Has recibido +50 de reputación!";
+  mensaje.style.color = "green";
+
+  // Guardamos la bandera para usar después
+  localStorage.setItem("activarSuperRep", "true");
+}
+
 }
 
 
