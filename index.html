@@ -200,7 +200,12 @@ function elegirGenero(gen) {
 function elegirOrigen(org) {
   origen = org;
   reputacion = org === 'campesino' ? 1 : org === 'escriba' ? 2 : org === 'mensajero' ? 1.5 : 2.5;
-  dinero = 0;
+  if (localStorage.getItem("activarDinemax") === "true") {
+  dinero = 900000;
+  localStorage.removeItem("activarDinemax"); // Eliminar para que no se repita
+} else {
+  
+}
   nivel = 0;
   mostrarNivel();
   iniciarSueldo();
@@ -297,23 +302,34 @@ function rendirse() {
   const input = document.getElementById("codigoInput").value.trim().toLowerCase();
   const mensaje = document.getElementById("mensajeCodigo");
 
-  if (input === "reyya") {
-    mensaje.textContent = "¡Has ascendido directamente a Rey!";
+  if (input === "dinemax") {
+    mensaje.textContent = "¡Comenzarás con $900.000!";
     mensaje.style.color = "green";
 
-    // Cambia el contenido del juego o el texto
-    document.getElementById("historia").innerHTML = "<p>¡Te han coronado como el Rey Supremo del Reino!</p>";
+    // Guardamos una bandera para usar más adelante
+    localStorage.setItem("activarDinemax", "true");
+
+  } else if (input === "reyya") {
+    mensaje.textContent = "¡Has ascendido directamente a Rey!";
+    mensaje.style.color = "green";
+    nivel = titulos[genero].length - 1;
+    reputacion = 999;
+    dinero = 999999;
+    mostrarNivel();
+
   } else if (input === "duqueplus") {
     mensaje.textContent = "¡Ahora eres un Duque!";
     mensaje.style.color = "green";
+    nivel = titulos[genero].indexOf(genero === "hombre" ? "Duque" : "Duquesa");
+    reputacion = 50;
+    dinero = 10000;
+    mostrarNivel();
 
-    document.getElementById("historia").innerHTML = "<p>Gracias a influencias misteriosas, te han hecho Duque sin pasar por el resto.</p>";
   } else {
     mensaje.textContent = "Código inválido.";
     mensaje.style.color = "red";
   }
 
-  // Limpia el input
   document.getElementById("codigoInput").value = "";
 }
 
