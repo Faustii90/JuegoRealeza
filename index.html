@@ -132,6 +132,13 @@ button:hover {
   </div>
 
 <button id="btnRendirse" onclick="rendirse()" style="display: none;">😩 Me Rindo</button>
+  <br>
+  <hr>
+<h3>¿Tienes un código secreto?</h3>
+<input type="text" id="codigoInput" placeholder="Escribe el código...">
+<button onclick="verificarCodigo()">Activar</button>
+<div id="mensajeCodigo" style="margin-top: 10px; font-weight: bold;"></div>
+
   <script>
 let genero = '';
 let origen = '';
@@ -285,6 +292,31 @@ function rendirse() {
     window.open('', '_self'); // Necesario en algunos navegadores
     window.close();
   }
-}  </script>
+} 
+  function verificarCodigo() {
+  const input = document.getElementById("codigoInput").value.trim().toLowerCase();
+  const mensaje = document.getElementById("mensajeCodigo");
+
+  if (input === "reyya") {
+    mensaje.textContent = "¡Has ascendido directamente a Rey!";
+    mensaje.style.color = "green";
+
+    // Cambia el contenido del juego o el texto
+    document.getElementById("historia").innerHTML = "<p>¡Te han coronado como el Rey Supremo del Reino!</p>";
+  } else if (input === "duqueplus") {
+    mensaje.textContent = "¡Ahora eres un Duque!";
+    mensaje.style.color = "green";
+
+    document.getElementById("historia").innerHTML = "<p>Gracias a influencias misteriosas, te han hecho Duque sin pasar por el resto.</p>";
+  } else {
+    mensaje.textContent = "Código inválido.";
+    mensaje.style.color = "red";
+  }
+
+  // Limpia el input
+  document.getElementById("codigoInput").value = "";
+}
+
+  </script>
 </body>
 </html>
