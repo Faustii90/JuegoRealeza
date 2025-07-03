@@ -306,6 +306,7 @@ function rendirse() {
   }
 } 
 function verificarCodigo() {
+    console.log("Botón verificarCodigo clickeado");
   const input = document.getElementById("codigoInput").value.trim().toLowerCase();
   const mensaje = document.getElementById("mensajeCodigo");
 
@@ -343,6 +344,9 @@ function verificarCodigo() {
   document.getElementById("codigoInput").value = "";
 }
 
+function verificarCodigo() {
+  alert("Funciona el botón!");
+}
 
   </script>
 </body>
