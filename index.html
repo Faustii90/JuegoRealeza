@@ -100,9 +100,9 @@ button:hover {
   <div id="origen" class="pantalla">
     <h2>Elige tu origen</h2>
     <button onclick="elegirOrigen('campesino')">⚒️ Campesino</button>
-    <button onclick="elegirOrigen('escriba')">📜 Escriba</button>
+    <button onclick="elegirOrigen('escriba')">🔨 Herrero aprendiz</button>
     <button onclick="elegirOrigen('mensajero')">🐎 Mensajero</button>
-    <button onclick="elegirOrigen('recluta')">⚔️ Recluta</button>
+    <button onclick="elegirOrigen('recluta')">⚔️ Soldado novato</button>
   </div>
 
   <div id="juego" class="pantalla">
@@ -138,6 +138,13 @@ button:hover {
 <input type="text" id="codigoInput" placeholder="Escribe el código...">
 <button onclick="verificarCodigo()">Activar</button>
 <div id="mensajeCodigo" style="margin-top: 10px; font-weight: bold;"></div>
+
+  <div id="pantallaFinal" class="pantalla">
+  <h1>👑 ¡Eres el Rey! 👑</h1>
+  <p>Has alcanzado el máximo poder en el reino. Ahora todos se inclinan ante ti.</p>
+  <button onclick="volverAlInicio()">Volver al Inicio</button>
+</div>
+
 
   <script>
 let genero = '';
@@ -273,8 +280,10 @@ function intentarAscenso() {
     dinero -= dineroReq;
     nivel++;
     if (nivel >= niveles.length) {
-      alert("¡Ya eres el máximo gobernante!");
-      nivel = niveles.length - 1;
+  mostrarFinal();
+  return;
+}
+
     }
     mostrarNivel();
   } else {
@@ -291,12 +300,12 @@ function iniciarSueldo() {
 }
 
 function rendirse() {
-  const confirmar = confirm("¿Estás seguro de que quieres rendirte y cerrar el juego?");
+  const confirmar = confirm("¿Estás seguro de que quieres rendirte y volver al inicio?");
   if (confirmar) {
-    window.open('', '_self'); // Necesario en algunos navegadores
-    window.close();
+    reiniciarJuego();
   }
-} 
+}
+
   function verificarCodigo() {
   const input = document.getElementById("codigoInput").value.trim().toLowerCase();
   const mensaje = document.getElementById("mensajeCodigo");
@@ -330,6 +339,27 @@ function rendirse() {
   }
 
   document.getElementById("codigoInput").value = "";
+}
+
+    function mostrarFinal() {
+  clearInterval(intervaloSueldo); // Detiene el sueldo automático
+  mostrarPantalla('pantallaFinal');
+  document.getElementById('btnRendirse').style.display = 'none';
+}
+
+    function reiniciarJuego() {
+  clearInterval(intervaloSueldo); // Detiene el sueldo automático
+  genero = '';
+  origen = '';
+  reputacion = 0;
+  dinero = 0;
+  nivel = 0;
+  decisionTomada = false;
+
+  document.getElementById('btnRendirse').style.display = 'none';
+  document.getElementById('codigoInput').value = '';
+  document.getElementById('mensajeCodigo').textContent = '';
+  mostrarPantalla('inicio');
 }
 
   </script>
